@@ -1076,6 +1076,14 @@ expression: document
         ],
         "type": "object"
       },
+      "NomReferentielDto": {
+        "enum": [
+          "missions",
+          "competences",
+          "motifs"
+        ],
+        "type": "string"
+      },
       "PlanDto": {
         "properties": {
           "annee": {
@@ -1791,7 +1799,7 @@ expression: document
     },
     "/api/fiches": {
       "get": {
-        "operationId": "lister",
+        "operationId": "lister_fiches",
         "parameters": [
           {
             "in": "query",
@@ -1940,7 +1948,7 @@ expression: document
         ]
       },
       "get": {
-        "operationId": "lire",
+        "operationId": "lire_fiche",
         "parameters": [
           {
             "in": "path",
@@ -2040,7 +2048,7 @@ expression: document
     },
     "/api/fiches/{id}/export": {
       "get": {
-        "operationId": "exporter",
+        "operationId": "exporter_fiche",
         "parameters": [
           {
             "in": "path",
@@ -2151,7 +2159,7 @@ expression: document
     },
     "/api/journal": {
       "get": {
-        "operationId": "lire",
+        "operationId": "lire_journal",
         "parameters": [
           {
             "in": "query",
@@ -2240,7 +2248,7 @@ expression: document
     },
     "/api/journal/export": {
       "get": {
-        "operationId": "exporter",
+        "operationId": "exporter_journal",
         "parameters": [
           {
             "in": "query",
@@ -2514,7 +2522,7 @@ expression: document
     },
     "/api/referentiels/{nom}": {
       "get": {
-        "operationId": "lister",
+        "operationId": "lister_referentiel",
         "parameters": [
           {
             "in": "path",

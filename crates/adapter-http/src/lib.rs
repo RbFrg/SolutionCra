@@ -66,7 +66,13 @@ use routes::{bilan, demo, fiches, journal, justifications, referentiels, semaine
         demo::entrer,
         demo::reinitialiser,
     ),
-    components(schemas(probleme::Probleme, probleme::ErreurChampDto))
+    // Les schémas cités seulement par un paramètre de chemin ne sont pas
+    // collectés automatiquement : sans eux, openapi-typescript échoue.
+    components(schemas(
+        probleme::Probleme,
+        probleme::ErreurChampDto,
+        referentiels::NomReferentielDto
+    ))
 )]
 pub struct ApiDoc;
 

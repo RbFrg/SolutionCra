@@ -143,6 +143,7 @@ fn filtre(requete: &RequeteJournal) -> Result<FiltreJournal, Probleme> {
 #[utoipa::path(
     get,
     path = "/api/journal",
+    operation_id = "lire_journal",
     tag = "journal",
     params(RequeteJournal),
     responses((status = 200, body = JournalDto))
@@ -200,6 +201,7 @@ pub struct RequeteExportJournal {
 #[utoipa::path(
     get,
     path = "/api/journal/export",
+    operation_id = "exporter_journal",
     tag = "journal",
     params(RequeteExportJournal),
     responses((status = 200, description = "Journal en CSV ou JSON", content_type = "application/octet-stream"))

@@ -72,6 +72,7 @@ pub struct RequeteReferentiel {
 #[utoipa::path(
     get,
     path = "/api/referentiels/{nom}",
+    operation_id = "lister_referentiel",
     tag = "referentiels",
     params(("nom" = NomReferentielDto, Path), RequeteReferentiel),
     responses((status = 200, body = Vec<EntreeDto>))

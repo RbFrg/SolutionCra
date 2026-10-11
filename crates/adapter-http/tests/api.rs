@@ -282,6 +282,41 @@ async fn ecriture_avec_origin_etrangere_retourne_403() {
 }
 
 #[tokio::test]
+async fn ecriture_de_la_meme_origine_que_l_hote_est_acceptee() {
+    // Non-régression : le front servi par le binaire écrit sur sa propre
+    // origine, absente de CRA_ALLOWED_ORIGINS ; c'était un 403.
+    let r = routeur(Mode::Demo);
+    let reponse = envoyer(
+        &r,
+        Request::post("/api/fiches")
+            .header("content-type", "application/json")
+            .header("host", "127.0.0.1:8080")
+            .header("origin", "http://127.0.0.1:8080")
+            .header("sec-fetch-site", "same-origin")
+            .body(Body::from(r#"{"lundi":"2026-10-05","type":"entreprise"}"#))
+            .unwrap(),
+    )
+    .await;
+    assert_eq!(reponse.statut, StatusCode::CREATED);
+}
+
+#[tokio::test]
+async fn une_origine_etrangere_reste_refusee_meme_avec_un_host() {
+    let r = routeur(Mode::Demo);
+    let reponse = envoyer(
+        &r,
+        Request::post("/api/fiches")
+            .header("content-type", "application/json")
+            .header("host", "127.0.0.1:8080")
+            .header("origin", "https://pirate.example.com")
+            .body(Body::from(r#"{"lundi":"2026-10-05","type":"entreprise"}"#))
+            .unwrap(),
+    )
+    .await;
+    assert_eq!(reponse.statut, StatusCode::FORBIDDEN);
+}
+
+#[tokio::test]
 async fn ecriture_sans_en_tetes_de_navigateur_est_acceptee() {
     let r = routeur(Mode::Demo);
     let reponse = envoyer(

@@ -185,6 +185,7 @@ pub struct RequeteFiches {
 #[utoipa::path(
     get,
     path = "/api/fiches",
+    operation_id = "lister_fiches",
     tag = "fiches",
     params(RequeteFiches),
     responses((status = 200, body = Vec<FicheResumeDto>))
@@ -263,6 +264,7 @@ pub async fn creer(
 #[utoipa::path(
     get,
     path = "/api/fiches/{id}",
+    operation_id = "lire_fiche",
     tag = "fiches",
     params(("id" = Uuid, Path)),
     responses(
@@ -434,6 +436,7 @@ pub(crate) fn reponse_fichier(fichier: Fichier, en_ligne: bool) -> Response {
 #[utoipa::path(
     get,
     path = "/api/fiches/{id}/export",
+    operation_id = "exporter_fiche",
     tag = "exports",
     params(("id" = Uuid, Path), RequeteExport),
     responses(

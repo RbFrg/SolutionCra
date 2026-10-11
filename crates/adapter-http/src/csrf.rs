@@ -41,10 +41,14 @@ pub async fn proteger(State(etat): State<Etat>, requete: Request, suivant: Next)
         return refus("csrf", "Requête venue d'un autre site.");
     }
 
-    // Règle 2 : une origine présente doit être autorisée.
+    // Règle 2 : une origine présente doit être celle du site lui-même (même
+    // hôte que l'en-tête Host) ou figurer dans CRA_ALLOWED_ORIGINS.
     if let Some(origine) = entetes.get(header::ORIGIN).and_then(|v| v.to_str().ok()) {
         let origine = origine.trim_end_matches('/');
-        if !etat.origines_autorisees.iter().any(|o| o == origine) {
+        let hote = entetes.get(header::HOST).and_then(|v| v.to_str().ok());
+        let meme_origine =
+            hote.is_some_and(|h| origine.split_once("://").map(|(_, a)| a) == Some(h));
+        if !meme_origine && !etat.origines_autorisees.iter().any(|o| o == origine) {
             return refus("csrf", "Origine non autorisée.");
         }
     }
