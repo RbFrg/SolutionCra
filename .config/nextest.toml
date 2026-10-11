@@ -1,0 +1,9 @@
+[profile.default]
+fail-fast = true
+
+[profile.ci]
+fail-fast = false
+retries = 0                # un test instable est un bug, pas un cas à rejouer
+
+[profile.ci.junit]
+path = "junit.xml"
