@@ -1,0 +1,54 @@
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data # certificats : à conserver
+      - caddy_config:/config
+    depends_on:
+      app: { condition: service_healthy }
+      demo: { condition: service_healthy }
+
+  app:
+    image: ghcr.io/${GITHUB_OWNER}/cra:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=info
+      - CRA_DB_PATH=/data/cra.db
+      - CRA_ALLOWED_ORIGINS=${APP_ORIGIN:-}
+    volumes:
+      - ./data:/data
+    healthcheck: # distroless : pas de curl, d'où une sous-commande du binaire
+      test: ["CMD", "/app/cra-server", "healthcheck"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+    # pas de "ports:" : l'appli n'est joignable que par Caddy
+
+  # Démonstration (4.5) : même image, aucun volume, aucun secret.
+  demo:
+    image: ghcr.io/${GITHUB_OWNER}/cra:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=info
+      - APP_MODE=demo
+      - CRA_ALLOWED_ORIGINS=${DEMO_ORIGIN:-}
+    healthcheck:
+      test: ["CMD", "/app/cra-server", "healthcheck"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  caddy_data:
+  caddy_config:

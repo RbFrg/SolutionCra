@@ -1,0 +1,2860 @@
+---
+source: crates/adapter-http/tests/contrat.rs
+expression: document
+---
+{
+  "components": {
+    "schemas": {
+      "AFaireDto": {
+        "properties": {
+          "echeance": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "lundi": {
+            "format": "date",
+            "type": "string"
+          },
+          "numero": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeFicheDto"
+          }
+        },
+        "required": [
+          "lundi",
+          "numero",
+          "type",
+          "echeance"
+        ],
+        "type": "object"
+      },
+      "ActionImportDto": {
+        "enum": [
+          "creer",
+          "ignorer"
+        ],
+        "type": "string"
+      },
+      "AjouterEntreeDto": {
+        "properties": {
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nom": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nom"
+        ],
+        "type": "object"
+      },
+      "AlerteDto": {
+        "properties": {
+          "echeance": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "joursRetard": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "lundi": {
+            "format": "date",
+            "type": "string"
+          },
+          "numero": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TypeFicheDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "lundi",
+          "numero",
+          "echeance"
+        ],
+        "type": "object"
+      },
+      "AlertesDto": {
+        "description": "Document versionné lu par n8n (4.6) : un changement incompatible crée un nouveau chemin.",
+        "properties": {
+          "aFaire": {
+            "items": {
+              "$ref": "#/components/schemas/AlerteDto"
+            },
+            "type": "array"
+          },
+          "aujourdhui": {
+            "format": "date",
+            "type": "string"
+          },
+          "enRetard": {
+            "items": {
+              "$ref": "#/components/schemas/AlerteDto"
+            },
+            "type": "array"
+          },
+          "genereLe": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "schemaVersion": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "schemaVersion",
+          "genereLe",
+          "aujourdhui",
+          "enRetard",
+          "aFaire"
+        ],
+        "type": "object"
+      },
+      "ApercuImportDto": {
+        "properties": {
+          "aCreer": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "avertissements": {
+            "items": {
+              "$ref": "#/components/schemas/MessageLigneDto"
+            },
+            "type": "array"
+          },
+          "ecrit": {
+            "type": "boolean"
+          },
+          "erreurs": {
+            "items": {
+              "$ref": "#/components/schemas/MessageLigneDto"
+            },
+            "type": "array"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LigneImportDto"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "lignes",
+          "erreurs",
+          "avertissements",
+          "aCreer",
+          "ecrit"
+        ],
+        "type": "object"
+      },
+      "AppliquerPlanDto": {
+        "properties": {
+          "au": {
+            "format": "date",
+            "type": "string"
+          },
+          "confirmer": {
+            "description": "À renvoyer à `true` après un 409 `confirmation-requise` (P-06).",
+            "type": "boolean"
+          },
+          "du": {
+            "format": "date",
+            "type": "string"
+          },
+          "libelle": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "typeAttendu": {
+            "$ref": "#/components/schemas/TypeAttenduDto"
+          }
+        },
+        "required": [
+          "du",
+          "au",
+          "typeAttendu"
+        ],
+        "type": "object"
+      },
+      "BilanDto": {
+        "properties": {
+          "annee": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "parCompetence": {
+            "description": "Heures par compétence : la durée entière d'une ligne compte pour\nchacune de ses compétences, la somme peut donc dépasser le total.",
+            "items": {
+              "$ref": "#/components/schemas/QuantiteDto"
+            },
+            "type": "array"
+          },
+          "parMission": {
+            "description": "Heures par mission.",
+            "items": {
+              "$ref": "#/components/schemas/QuantiteDto"
+            },
+            "type": "array"
+          },
+          "parMois": {
+            "items": {
+              "$ref": "#/components/schemas/MoisDto"
+            },
+            "type": "array"
+          },
+          "parMotif": {
+            "description": "Nombre de semaines justifiées par motif.",
+            "items": {
+              "$ref": "#/components/schemas/QuantiteDto"
+            },
+            "type": "array"
+          },
+          "ponctualite": {
+            "$ref": "#/components/schemas/PonctualiteDto"
+          },
+          "totalHeures": {
+            "format": "double",
+            "type": "number"
+          },
+          "totaux": {
+            "$ref": "#/components/schemas/TotauxDto"
+          }
+        },
+        "required": [
+          "annee",
+          "totaux",
+          "ponctualite",
+          "parMois",
+          "parMotif",
+          "parMission",
+          "parCompetence",
+          "totalHeures"
+        ],
+        "type": "object"
+      },
+      "ChangerStatutDto": {
+        "properties": {
+          "date": {
+            "description": "Date de Paris, lue pour `transmise` et `validee` ; aujourd'hui par défaut.",
+            "format": "date",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutFicheDto"
+          },
+          "version": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "statut",
+          "version"
+        ],
+        "type": "object"
+      },
+      "ColonnesDto": {
+        "properties": {
+          "colonnes": {
+            "description": "Les six libellés, dans l'ordre (18.4).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeFicheDto"
+          }
+        },
+        "required": [
+          "type",
+          "colonnes"
+        ],
+        "type": "object"
+      },
+      "Config": {
+        "properties": {
+          "build": {
+            "type": "string"
+          },
+          "dateFigee": {
+            "description": "Présente en démo seulement : date figée (M-04).",
+            "format": "date",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mode": {
+            "$ref": "#/components/schemas/ModeDto"
+          }
+        },
+        "required": [
+          "mode",
+          "build"
+        ],
+        "type": "object"
+      },
+      "CreerFicheDto": {
+        "properties": {
+          "lundi": {
+            "format": "date",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeFicheDto"
+          }
+        },
+        "required": [
+          "lundi",
+          "type"
+        ],
+        "type": "object"
+      },
+      "EntreeDto": {
+        "properties": {
+          "archivee": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nom": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nom",
+          "archivee"
+        ],
+        "type": "object"
+      },
+      "EntreeEnregistreeDto": {
+        "properties": {
+          "avertissement": {
+            "description": "Avertissement non bloquant (compétence sans verbe à l'infinitif).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "entree": {
+            "$ref": "#/components/schemas/EntreeDto"
+          }
+        },
+        "required": [
+          "entree"
+        ],
+        "type": "object"
+      },
+      "EntreeNommeeDto": {
+        "properties": {
+          "archivee": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nom": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nom",
+          "archivee"
+        ],
+        "type": "object"
+      },
+      "ErreurChampDto": {
+        "properties": {
+          "field": {
+            "description": "Chemin du champ, par exemple `lignes[2].mission`.",
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "message"
+        ],
+        "type": "object"
+      },
+      "EvenementDto": {
+        "properties": {
+          "apres": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "avant": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "cibleId": {
+            "type": "string"
+          },
+          "cibleType": {
+            "type": "string"
+          },
+          "horodatage": {
+            "description": "UTC ; le front l'affiche en Europe/Paris.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "libelle": {
+            "type": "string"
+          },
+          "lundi": {
+            "format": "date",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "numero": {
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "resume": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeEvenementDto"
+          }
+        },
+        "required": [
+          "id",
+          "horodatage",
+          "type",
+          "libelle",
+          "cibleType",
+          "cibleId",
+          "resume"
+        ],
+        "type": "object"
+      },
+      "FicheDto": {
+        "properties": {
+          "colonnes": {
+            "description": "Les six libellés de colonnes du type (18.4).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "creeeLe": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "dimanche": {
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LigneDto"
+            },
+            "type": "array"
+          },
+          "lundi": {
+            "format": "date",
+            "type": "string"
+          },
+          "modifieeApresTransmission": {
+            "type": "boolean"
+          },
+          "modifieeApresTransmissionLe": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "modifieeLe": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "numero": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutFicheDto"
+          },
+          "termineeLe": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "totalHeures": {
+            "format": "double",
+            "type": "number"
+          },
+          "transmiseLe": {
+            "format": "date",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeFicheDto"
+          },
+          "valideeLe": {
+            "format": "date",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "description": "Concurrence optimiste : à renvoyer à chaque écriture (4.1).",
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "lundi",
+          "dimanche",
+          "numero",
+          "type",
+          "statut",
+          "modifieeApresTransmission",
+          "version",
+          "totalHeures",
+          "colonnes",
+          "lignes",
+          "creeeLe",
+          "modifieeLe"
+        ],
+        "type": "object"
+      },
+      "FicheResumeDto": {
+        "properties": {
+          "dimanche": {
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "lundi": {
+            "format": "date",
+            "type": "string"
+          },
+          "missionPrincipale": {
+            "description": "Mission de la première ligne, pour la liste.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "modifieeApresTransmission": {
+            "type": "boolean"
+          },
+          "modifieeLe": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "nbLignes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "numero": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutFicheDto"
+          },
+          "totalHeures": {
+            "format": "double",
+            "type": "number"
+          },
+          "transmiseLe": {
+            "format": "date",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeFicheDto"
+          },
+          "version": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "lundi",
+          "dimanche",
+          "numero",
+          "type",
+          "statut",
+          "version",
+          "totalHeures",
+          "nbLignes",
+          "modifieeApresTransmission",
+          "modifieeLe"
+        ],
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "status": {
+            "description": "Toujours `ok` quand le serveur répond.",
+            "type": "string"
+          },
+          "version": {
+            "description": "SHA du commit déployé, comparé par la CI après déploiement (10.5).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "version"
+        ],
+        "type": "object"
+      },
+      "IndicateursDto": {
+        "properties": {
+          "aFaire": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "aFaireCetteSemaine": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AFaireDto"
+              }
+            ]
+          },
+          "attendues": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "comptees": {
+            "description": "Dénominateur du taux : attendues moins justifiées (J-05).",
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "enRetard": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "faites": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "justifiees": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "tauxFaites": {
+            "description": "Faites / comptées ; absent sans semaine attendue.",
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "attendues",
+          "faites",
+          "justifiees",
+          "enRetard",
+          "aFaire",
+          "comptees"
+        ],
+        "type": "object"
+      },
+      "JournalDto": {
+        "properties": {
+          "entrees": {
+            "items": {
+              "$ref": "#/components/schemas/EvenementDto"
+            },
+            "type": "array"
+          },
+          "page": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "pages": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "taille": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "entrees",
+          "total",
+          "page",
+          "taille",
+          "pages"
+        ],
+        "type": "object"
+      },
+      "JustificationDto": {
+        "properties": {
+          "commentaire": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "creeeLe": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "leveeLe": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lundi": {
+            "format": "date",
+            "type": "string"
+          },
+          "motif": {
+            "type": "string"
+          },
+          "motifId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "numero": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeFicheDto"
+          }
+        },
+        "required": [
+          "id",
+          "lundi",
+          "numero",
+          "type",
+          "motifId",
+          "motif",
+          "creeeLe"
+        ],
+        "type": "object"
+      },
+      "JustifierDto": {
+        "properties": {
+          "commentaire": {
+            "description": "Obligatoire pour le motif « Autre » (J-04).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lundi": {
+            "format": "date",
+            "type": "string"
+          },
+          "motifId": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TypeFicheDto"
+          }
+        },
+        "required": [
+          "lundi",
+          "type",
+          "motifId"
+        ],
+        "type": "object"
+      },
+      "LigneDto": {
+        "properties": {
+          "competenceIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "competences": {
+            "items": {
+              "$ref": "#/components/schemas/EntreeNommeeDto"
+            },
+            "type": "array"
+          },
+          "date": {
+            "format": "date",
+            "type": "string"
+          },
+          "dureeHeures": {
+            "format": "double",
+            "type": "number"
+          },
+          "echangesTuteur": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "etapes": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "mission": {
+            "$ref": "#/components/schemas/EntreeNommeeDto",
+            "description": "Nom en lecture seule, ignoré à l'écriture."
+          },
+          "missionId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "date",
+          "missionId",
+          "mission",
+          "competenceIds",
+          "competences",
+          "dureeHeures",
+          "etapes"
+        ],
+        "type": "object"
+      },
+      "LigneImportDto": {
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/ActionImportDto"
+          },
+          "archivee": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ligne": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "nom": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ligne",
+          "nom",
+          "archivee",
+          "action"
+        ],
+        "type": "object"
+      },
+      "LigneSaisieDto": {
+        "properties": {
+          "competenceIds": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "date": {
+            "format": "date",
+            "type": "string"
+          },
+          "dureeHeures": {
+            "description": "Heures décimales au quart d'heure (0,25 à 12).",
+            "format": "double",
+            "type": "number"
+          },
+          "echangesTuteur": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "etapes": {
+            "type": "string"
+          },
+          "id": {
+            "description": "Nul pour une nouvelle ligne.",
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "missionId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "missionId",
+          "dureeHeures"
+        ],
+        "type": "object"
+      },
+      "MessageLigneDto": {
+        "properties": {
+          "ligne": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ligne",
+          "message"
+        ],
+        "type": "object"
+      },
+      "ModeDto": {
+        "enum": [
+          "production",
+          "demo"
+        ],
+        "type": "string"
+      },
+      "ModifierEntreeDto": {
+        "properties": {
+          "archivee": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "code": {
+            "description": "`null` efface le code ; absent, il est conservé.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nom": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "MoisDto": {
+        "properties": {
+          "enRetard": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "faites": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "justifiees": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "libelle": {
+            "type": "string"
+          },
+          "mois": {
+            "description": "`AAAA-MM`",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mois",
+          "libelle",
+          "enRetard",
+          "justifiees",
+          "faites"
+        ],
+        "type": "object"
+      },
+      "NomReferentielDto": {
+        "enum": [
+          "missions",
+          "competences",
+          "motifs"
+        ],
+        "type": "string"
+      },
+      "PlanDto": {
+        "properties": {
+          "annee": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "aujourdhui": {
+            "format": "date",
+            "type": "string"
+          },
+          "semaines": {
+            "description": "52 ou 53 semaines ; une semaine sans ligne vaut Entreprise (P-04).",
+            "items": {
+              "$ref": "#/components/schemas/SemaineDto"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "annee",
+          "aujourdhui",
+          "semaines"
+        ],
+        "type": "object"
+      },
+      "PonctualiteDto": {
+        "properties": {
+          "delaiMoyenJours": {
+            "description": "Jours entre le dimanche et la clôture ; zéro ou moins = à l'heure.",
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "echues": {
+            "description": "Semaines échues, attendues, non justifiées.",
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "ponctuelles": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "taux": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "ponctuelles",
+          "echues"
+        ],
+        "type": "object"
+      },
+      "Probleme": {
+        "properties": {
+          "detail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErreurChampDto"
+            },
+            "type": "array"
+          },
+          "ficheId": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "semainesPasseesTouchees": {
+            "items": {
+              "format": "date",
+              "type": "string"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "status": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "versionCourante": {
+            "format": "int32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status"
+        ],
+        "type": "object"
+      },
+      "QuantiteDto": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nom": {
+            "type": "string"
+          },
+          "valeur": {
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "nom",
+          "valeur"
+        ],
+        "type": "object"
+      },
+      "SauvegarderFicheDto": {
+        "properties": {
+          "lignes": {
+            "items": {
+              "$ref": "#/components/schemas/LigneSaisieDto"
+            },
+            "type": "array"
+          },
+          "version": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "lignes"
+        ],
+        "type": "object"
+      },
+      "SemaineDto": {
+        "description": "Une semaine et son statut, pour le calendrier, la frise et le plan.",
+        "properties": {
+          "dimanche": {
+            "format": "date",
+            "type": "string"
+          },
+          "echeance": {
+            "description": "Dimanche 23h59m59, heure de Paris.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "ficheId": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "joursRetard": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "justificationId": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "libelle": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lundi": {
+            "format": "date",
+            "type": "string"
+          },
+          "motifId": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "numero": {
+            "description": "Numéro ISO 8601.",
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "statut": {
+            "$ref": "#/components/schemas/StatutSemaineDto"
+          },
+          "statutFiche": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StatutFicheDto"
+              }
+            ]
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/TypeFicheDto",
+                "description": "Type évalué : celui du filtre, ou celui du plan pour « toutes »."
+              }
+            ]
+          },
+          "typeAttendu": {
+            "$ref": "#/components/schemas/TypeAttenduDto"
+          }
+        },
+        "required": [
+          "lundi",
+          "dimanche",
+          "numero",
+          "typeAttendu",
+          "statut",
+          "echeance"
+        ],
+        "type": "object"
+      },
+      "SemainePlanDto": {
+        "properties": {
+          "libelle": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lundi": {
+            "format": "date",
+            "type": "string"
+          },
+          "numero": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "typeAttendu": {
+            "$ref": "#/components/schemas/TypeAttenduDto"
+          }
+        },
+        "required": [
+          "lundi",
+          "numero",
+          "typeAttendu"
+        ],
+        "type": "object"
+      },
+      "StatutFicheDto": {
+        "enum": [
+          "brouillon",
+          "terminee",
+          "transmise",
+          "validee"
+        ],
+        "type": "string"
+      },
+      "StatutSemaineDto": {
+        "description": "Statut de semaine **calculé par le serveur** ; le front ne le recalcule jamais.",
+        "enum": [
+          "faite",
+          "a_faire",
+          "en_retard",
+          "a_venir",
+          "non_attendue",
+          "justifiee"
+        ],
+        "type": "string"
+      },
+      "TableauDeBordDto": {
+        "properties": {
+          "annee": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "aujourdhui": {
+            "description": "Date de Paris selon le serveur (figée en démo).",
+            "format": "date",
+            "type": "string"
+          },
+          "indicateurs": {
+            "$ref": "#/components/schemas/IndicateursDto"
+          },
+          "retards": {
+            "description": "Semaines en retard, de la plus ancienne à la plus récente.",
+            "items": {
+              "$ref": "#/components/schemas/SemaineDto"
+            },
+            "type": "array"
+          },
+          "semaineCourante": {
+            "format": "date",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "semaines": {
+            "description": "Toutes les semaines de l'année (calendrier et frise).",
+            "items": {
+              "$ref": "#/components/schemas/SemaineDto"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "aujourdhui",
+          "annee",
+          "indicateurs",
+          "retards",
+          "semaines"
+        ],
+        "type": "object"
+      },
+      "TotauxDto": {
+        "properties": {
+          "aFaire": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "attendues": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "enRetard": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "faites": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "justifiees": {
+            "format": "int32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "tauxFaites": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "attendues",
+          "faites",
+          "justifiees",
+          "enRetard",
+          "aFaire"
+        ],
+        "type": "object"
+      },
+      "TypeAttenduDto": {
+        "enum": [
+          "entreprise",
+          "formation",
+          "aucune"
+        ],
+        "type": "string"
+      },
+      "TypeEvenementDto": {
+        "enum": [
+          "fiche_creee",
+          "statut_modifie",
+          "fiche_modifiee_apres_transmission",
+          "fiche_supprimee",
+          "semaine_justifiee",
+          "justification_levee",
+          "calendrier_modifie",
+          "referentiel_modifie",
+          "import",
+          "export"
+        ],
+        "type": "string"
+      },
+      "TypeFicheDto": {
+        "enum": [
+          "entreprise",
+          "formation"
+        ],
+        "type": "string"
+      }
+    }
+  },
+  "info": {
+    "description": "API JSON du suivi hebdomadaire des fiches CRA.",
+    "license": {
+      "identifier": "UNLICENSED",
+      "name": "UNLICENSED"
+    },
+    "title": "Solution CRA Powered by Rust",
+    "version": "1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/alertes": {
+      "get": {
+        "operationId": "alertes",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertesDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "semaines"
+        ]
+      }
+    },
+    "/api/bilan": {
+      "get": {
+        "operationId": "bilan",
+        "parameters": [
+          {
+            "description": "Année scolaire de début (2026 ou 2027) ; par défaut, celle d'aujourd'hui.",
+            "in": "query",
+            "name": "annee",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Filtre de type ; `toutes` par défaut.",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "toutes",
+                "entreprise",
+                "formation"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BilanDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "bilan"
+        ]
+      }
+    },
+    "/api/bilan/{fichier}": {
+      "get": {
+        "operationId": "bilan_csv",
+        "parameters": [
+          {
+            "description": "totaux.csv, retards-par-mois.csv, justifications-par-motif.csv, temps-par-mission.csv ou temps-par-competence.csv",
+            "in": "path",
+            "name": "fichier",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Année scolaire de début (2026 ou 2027) ; par défaut, celle d'aujourd'hui.",
+            "in": "query",
+            "name": "annee",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Filtre de type ; `toutes` par défaut.",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "toutes",
+                "entreprise",
+                "formation"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {}
+            },
+            "description": "Tableau en CSV"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "bilan"
+        ]
+      }
+    },
+    "/api/config": {
+      "get": {
+        "operationId": "config",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Config"
+                }
+              }
+            },
+            "description": "Mode d'exécution et build"
+          }
+        },
+        "tags": [
+          "systeme"
+        ]
+      }
+    },
+    "/api/demo/entrer": {
+      "post": {
+        "operationId": "entrer",
+        "responses": {
+          "204": {
+            "description": "Démo uniquement : entre sans mot de passe"
+          }
+        },
+        "tags": [
+          "demo"
+        ]
+      }
+    },
+    "/api/demo/reinitialiser": {
+      "post": {
+        "operationId": "reinitialiser",
+        "responses": {
+          "204": {
+            "description": "Démo uniquement : restaure le jeu de départ (M-05)"
+          }
+        },
+        "tags": [
+          "demo"
+        ]
+      }
+    },
+    "/api/export/complet": {
+      "get": {
+        "operationId": "complet",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "enum": [
+                "csv",
+                "json"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {}
+            },
+            "description": "JSON unique ou archive zip de CSV"
+          }
+        },
+        "tags": [
+          "exports"
+        ]
+      }
+    },
+    "/api/export/lot": {
+      "get": {
+        "operationId": "lot",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "periode",
+            "required": true,
+            "schema": {
+              "enum": [
+                "mois",
+                "annee"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "`2026-10` pour un mois, `2026` pour une année scolaire.",
+            "in": "query",
+            "name": "valeur",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "toutes",
+                "entreprise",
+                "formation"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "`docx` ou `pdf` (`html` accepté).",
+            "in": "query",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "enum": [
+                "html",
+                "docx",
+                "pdf"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {}
+            },
+            "description": "Une fiche par page (PDF) ou par section (Word)"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": "Aucune fiche pour cette période"
+          }
+        },
+        "tags": [
+          "exports"
+        ]
+      }
+    },
+    "/api/fiches": {
+      "get": {
+        "operationId": "lister_fiches",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "annee",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "toutes",
+                "entreprise",
+                "formation"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "statut",
+            "required": false,
+            "schema": {
+              "enum": [
+                "brouillon",
+                "terminee",
+                "transmise",
+                "validee"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FicheResumeDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "fiches"
+        ]
+      },
+      "post": {
+        "operationId": "creer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreerFicheDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FicheDto"
+                }
+              }
+            },
+            "description": "",
+            "headers": {
+              "Location": {
+                "description": "/api/fiches/{id}",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": "fiche-existante"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "fiches"
+        ]
+      }
+    },
+    "/api/fiches/{id}": {
+      "delete": {
+        "operationId": "supprimer",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Fiche supprimée ; le journal la garde"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "fiches"
+        ]
+      },
+      "get": {
+        "operationId": "lire_fiche",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FicheDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "fiches"
+        ]
+      },
+      "put": {
+        "operationId": "sauvegarder",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SauvegarderFicheDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FicheDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": "conflit-de-version"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "fiches"
+        ]
+      }
+    },
+    "/api/fiches/{id}/export": {
+      "get": {
+        "operationId": "exporter_fiche",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "enum": [
+                "html",
+                "docx",
+                "pdf"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {}
+            },
+            "description": "Fichier HTML (styles en ligne), Word ou PDF"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "exports"
+        ]
+      }
+    },
+    "/api/fiches/{id}/statut": {
+      "put": {
+        "operationId": "changer_statut",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangerStatutDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FicheDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": "terminee-sans-ligne"
+          }
+        },
+        "tags": [
+          "fiches"
+        ]
+      }
+    },
+    "/api/journal": {
+      "get": {
+        "operationId": "lire_journal",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "fiche_creee",
+                "statut_modifie",
+                "fiche_modifiee_apres_transmission",
+                "fiche_supprimee",
+                "semaine_justifiee",
+                "justification_levee",
+                "calendrier_modifie",
+                "referentiel_modifie",
+                "import",
+                "export"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "du",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "au",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Lundi de la semaine concernée.",
+            "in": "query",
+            "name": "semaine",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "50 par défaut, 200 au plus.",
+            "in": "query",
+            "name": "taille",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/journal/export": {
+      "get": {
+        "operationId": "exporter_journal",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "required": true,
+            "schema": {
+              "enum": [
+                "csv",
+                "json"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "fiche_creee",
+                "statut_modifie",
+                "fiche_modifiee_apres_transmission",
+                "fiche_supprimee",
+                "semaine_justifiee",
+                "justification_levee",
+                "calendrier_modifie",
+                "referentiel_modifie",
+                "import",
+                "export"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "du",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "au",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "semaine",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {}
+            },
+            "description": "Journal en CSV ou JSON"
+          }
+        },
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/api/justifications": {
+      "post": {
+        "operationId": "justifier",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JustifierDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JustificationDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "justifications"
+        ]
+      }
+    },
+    "/api/justifications/{id}": {
+      "delete": {
+        "operationId": "lever",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JustificationDto"
+                }
+              }
+            },
+            "description": "Justification levée (la ligne reste)"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "justifications"
+        ]
+      }
+    },
+    "/api/meta/colonnes": {
+      "get": {
+        "operationId": "meta_colonnes",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "entreprise",
+                "formation"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColonnesDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "fiches"
+        ]
+      }
+    },
+    "/api/plan": {
+      "get": {
+        "operationId": "plan",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "annee",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "semaines"
+        ]
+      },
+      "put": {
+        "operationId": "appliquer_plan",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppliquerPlanDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SemainePlanDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": ""
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": "confirmation-requise"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "semaines"
+        ]
+      }
+    },
+    "/api/referentiels/{nom}": {
+      "get": {
+        "operationId": "lister_referentiel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nom",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/NomReferentielDto"
+            }
+          },
+          {
+            "description": "Inclure les entrées archivées.",
+            "in": "query",
+            "name": "archivees",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EntreeDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "referentiels"
+        ]
+      },
+      "post": {
+        "operationId": "ajouter",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nom",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/NomReferentielDto"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AjouterEntreeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntreeEnregistreeDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "referentiels"
+        ]
+      }
+    },
+    "/api/referentiels/{nom}/import": {
+      "post": {
+        "operationId": "importer",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nom",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/NomReferentielDto"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mode",
+            "required": true,
+            "schema": {
+              "enum": [
+                "apercu",
+                "valider"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/csv": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApercuImportDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "referentiels"
+        ]
+      }
+    },
+    "/api/referentiels/{nom}/{id}": {
+      "patch": {
+        "operationId": "modifier",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nom",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/NomReferentielDto"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifierEntreeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntreeEnregistreeDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "referentiels"
+        ]
+      }
+    },
+    "/api/semaines": {
+      "get": {
+        "operationId": "semaines",
+        "parameters": [
+          {
+            "description": "Année scolaire de début (2026 ou 2027) ; par défaut, celle d'aujourd'hui.",
+            "in": "query",
+            "name": "annee",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Filtre de type ; `toutes` par défaut.",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "toutes",
+                "entreprise",
+                "formation"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SemaineDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "semaines"
+        ]
+      }
+    },
+    "/api/tableau-de-bord": {
+      "get": {
+        "operationId": "tableau_de_bord",
+        "parameters": [
+          {
+            "description": "Année scolaire de début (2026 ou 2027) ; par défaut, celle d'aujourd'hui.",
+            "in": "query",
+            "name": "annee",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Filtre de type ; `toutes` par défaut.",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "toutes",
+                "entreprise",
+                "formation"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableauDeBordDto"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Probleme"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "semaines"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Statut et version du build"
+          }
+        },
+        "tags": [
+          "systeme"
+        ]
+      }
+    }
+  }
+}

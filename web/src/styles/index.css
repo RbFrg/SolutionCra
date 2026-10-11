@@ -1,0 +1,53 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* Les jetons deviennent des couleurs Tailwind sans dupliquer les valeurs. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surf: var(--surf);
+  --color-head: var(--head);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink2);
+  --color-mut: var(--mut);
+  --color-line: var(--line);
+  --color-line2: var(--line2);
+  --color-acc: var(--acc);
+  --color-on-acc: var(--on-acc);
+  --color-acc-bg: var(--acc-bg);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-err: var(--err);
+  --color-err-bg: var(--err-bg);
+  --color-press-bg: var(--press-bg);
+  --color-press-fg: var(--press-fg);
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+/* Focus visible : 2 px d'accent, décalé de 2 px (A-07). */
+:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

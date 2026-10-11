@@ -1,0 +1,152 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.99.0
+        with: { components: "rustfmt, clippy" }
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - uses: taiki-e/install-action@nextest
+      - run: cargo nextest run --workspace --profile ci
+        env: { INSTA_UPDATE: "no" }
+      - run: cargo test --workspace --doc
+      - uses: EmbarkStudios/cargo-deny-action@v2
+
+  web:
+    runs-on: ubuntu-24.04
+    defaults: { run: { working-directory: web } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: web/.nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm run test -- --coverage
+      - run: npm run build
+      - run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true # informatif ; Dependabot traite les alertes
+
+  contract: # l'API Rust et le client TypeScript restent synchronisés
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.99.0
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: web/.nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: cargo run -p cra-server -- openapi --out openapi.json
+      - run: npm run gen:api
+        working-directory: web
+      - run: git diff --exit-code -- openapi.json web/src/api/schema.d.ts
+
+  image:
+    needs: [test, web, contract]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04-arm # natif arm64
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/cra
+          tags: |
+            type=raw,value=${{ github.sha }}
+            type=raw,value=latest
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: GIT_SHA=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: image
+    # Activé quand la variable DEPLOY_ENABLED vaut "true" (VM prête, secrets posés : 10.6).
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    environment: production
+    concurrency: { group: deploy-production, cancel-in-progress: false }
+    steps:
+      - uses: actions/checkout@v4 # pour deploy/compose.yaml
+      - name: Préparer SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.VM_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Déployer
+        env:
+          VM: ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}
+          SHA: ${{ github.sha }}
+        run: |
+          scp -i ~/.ssh/id_deploy deploy/compose.yaml "$VM:cra/compose.yaml"
+          ssh -i ~/.ssh/id_deploy "$VM" "cd ~/cra \
+            && (test ! -x ./backup.sh || sudo ./backup.sh) \
+            && sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=$SHA/' .env \
+            && docker compose pull \
+            && docker compose up -d --remove-orphans \
+            && docker image prune -f"
+      - name: Vérifier la version déployée
+        env:
+          URL: https://${{ vars.APP_DOMAIN }}/health
+          SHA: ${{ github.sha }}
+        run: |
+          for i in $(seq 1 15); do
+            curl -fsS "$URL" | grep -q "$SHA" && exit 0
+            sleep 4
+          done
+          echo "La version attendue ($SHA) n'est pas servie par $URL" >&2
+          exit 1
+      - name: Vérifier la démo
+        if: vars.DEMO_DOMAIN != ''
+        env:
+          URL: https://${{ vars.DEMO_DOMAIN }}/api/config
+        run: |
+          for i in $(seq 1 15); do
+            curl -fsS "$URL" | grep -q '"mode":"demo"' && exit 0
+            sleep 4
+          done
+          echo "La démo ne répond pas en mode demo sur $URL" >&2
+          exit 1
