@@ -1,0 +1,78 @@
+/* Jetons de la direction artistique (21.2, 21.9) : le seul fichier qui
+   contient des couleurs. Les deux blocs sombres sont identiques (test). */
+
+:root {
+  color-scheme: light;
+  --bg: #f6f6f4;
+  --surf: #ffffff;
+  --head: #fbfbfa;
+  --ink: #15171a;
+  --ink2: #4a5058;
+  --mut: #646a73;
+  --line: #e2e3e1;
+  --line2: #c9cbc8;
+  --acc: #28457a;
+  --on-acc: #ffffff;
+  --acc-bg: #e8edf6;
+  --ok: #1f6b45;
+  --ok-bg: #e6f1ea;
+  --warn: #8a5a00;
+  --warn-bg: #fbf4e6;
+  --err: #a12b2b;
+  --err-bg: #fbeaea;
+  --press-bg: #15171a;
+  --press-fg: #ffffff;
+  --scrim: rgba(21, 23, 26, 0.45);
+}
+
+/* Système : sombre si le navigateur le demande, sauf choix manuel « clair ». */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="clair"]) {
+    color-scheme: dark;
+    --bg: #121315;
+    --surf: #1a1c1f;
+    --head: #202327;
+    --ink: #ecedee;
+    --ink2: #b4b8be;
+    --mut: #9298a0;
+    --line: #2c2f34;
+    --line2: #40444b;
+    --acc: #8faae0;
+    --on-acc: #0e1420;
+    --acc-bg: #1b2536;
+    --ok: #5cc18a;
+    --ok-bg: #15281e;
+    --warn: #e0a93b;
+    --warn-bg: #2a2212;
+    --err: #f07a7a;
+    --err-bg: #2d1a1a;
+    --press-bg: #ecedee;
+    --press-fg: #121315;
+    --scrim: rgba(0, 0, 0, 0.62);
+  }
+}
+
+/* Choix manuel « sombre ». */
+:root[data-theme="sombre"] {
+  color-scheme: dark;
+  --bg: #121315;
+  --surf: #1a1c1f;
+  --head: #202327;
+  --ink: #ecedee;
+  --ink2: #b4b8be;
+  --mut: #9298a0;
+  --line: #2c2f34;
+  --line2: #40444b;
+  --acc: #8faae0;
+  --on-acc: #0e1420;
+  --acc-bg: #1b2536;
+  --ok: #5cc18a;
+  --ok-bg: #15281e;
+  --warn: #e0a93b;
+  --warn-bg: #2a2212;
+  --err: #f07a7a;
+  --err-bg: #2d1a1a;
+  --press-bg: #ecedee;
+  --press-fg: #121315;
+  --scrim: rgba(0, 0, 0, 0.62);
+}
