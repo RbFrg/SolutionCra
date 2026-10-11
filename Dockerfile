@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # 1. Front : build Vite -> /web/dist (version alignée sur web/.nvmrc)
-FROM node:24-slim AS web
+FROM node:25-slim AS web
 WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
