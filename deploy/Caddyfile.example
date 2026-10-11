@@ -1,0 +1,40 @@
+# Modèle : la copie réelle vit sur la VM (~/cra/Caddyfile), hors dépôt.
+# Remplacer les domaines et le hash (docker run --rm -it caddy:2 caddy hash-password).
+
+monnom-cra.duckdns.org {
+    encode zstd gzip
+
+    # En-têtes de sécurité, jusqu'à ce que l'application les émette (tranche 5, 17.7).
+    header {
+        Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'"
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+        -Server
+    }
+
+    # /health reste public : la CI vérifie la version déployée.
+    @health path /health
+    handle @health {
+        reverse_proxy app:8080
+    }
+
+    # Transitoire jusqu'à la tranche « Accès sécurisé » (17.4).
+    handle {
+        basic_auth {
+            moi COLLER_ICI_LE_HASH
+        }
+        reverse_proxy app:8080
+    }
+}
+
+# Démonstration : autre sous-domaine, sans mot de passe, données fictives.
+monnom-cra-demo.duckdns.org {
+    encode zstd gzip
+    header {
+        Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'"
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+        -Server
+    }
+    reverse_proxy demo:8080
+}
