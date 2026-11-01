@@ -9,7 +9,7 @@ COPY web/ ./
 RUN npm run build
 
 # 2. Back : dépendances en cache (cargo-chef), puis compilation
-FROM lukemathwalker/cargo-chef:latest-rust-1.99.0 AS chef
+FROM lukemathwalker/cargo-chef:latest-rust-1.99.1 AS chef
 WORKDIR /app
 
 FROM chef AS planner
